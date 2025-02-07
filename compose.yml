@@ -1,0 +1,57 @@
+services:
+    web:
+        build: .
+        profiles:
+            - dont-start
+
+    web-prod:
+        extends:
+            service: web
+        container_name: web-prod
+        ports:
+            - ${API_PORT}:8000
+        command: uvicorn src.main:app --host 0.0.0.0 --port 8000
+        depends_on:
+            - db-prod
+        profiles:
+            - prod
+
+    web-test:
+        extends:
+            service: web
+        container_name: web-test
+        command: >
+            sh -c "pip install --no-cache-dir -r requirements/test.txt &&
+                   pytest -q tests"
+        depends_on:
+            - db-test
+        profiles:
+            - test
+
+    db:
+        image: postgres:17.2
+        environment:
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_NAME}
+        profiles:
+            - dont-start
+
+    db-prod:
+        extends:
+            service: db
+        container_name: db-prod
+        volumes:
+            - data:/var/lib/postgresql/data
+        profiles:
+            - prod
+
+    db-test:
+        extends:
+            service: db
+        container_name: db-test
+        profiles:
+            - test
+
+volumes:
+    data:
