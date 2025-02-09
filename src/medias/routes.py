@@ -32,6 +32,7 @@ router = APIRouter(prefix="/medias", tags=["Изображения"])
 )
 async def _upload(file: UploadFile, service: Service, user: CurrentUser) -> DataMedia:
     """
-    Загрузка изображения. Предварительный этап для последующего создания публикации.
+    Загрузка изображения. Является предварительным этапом для последующего создания публикации. Для получения
+    загруженного изображения см. раздел «Статические файлы».
     """
     return await service.save(file)

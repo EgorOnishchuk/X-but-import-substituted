@@ -73,16 +73,27 @@ class SQLAlchemyTweetRepository(SQLAlchemyRepository, TweetRepository):
         )
 
     async def get_all(self, user_id: UUID) -> list[SQLAlchemyTweet]:
-        return (await self._session.execute(
-            select(SQLAlchemyTweet)
-            .outerjoin(sqlalchemy_likes)
-            .join(SQLAlchemyUser, SQLAlchemyTweet.author_id == SQLAlchemyUser.id)
-            .join(sqlalchemy_follows, sqlalchemy_follows.c.followed_id == SQLAlchemyTweet.author_id)
-            .where(sqlalchemy_follows.c.follower_id == user_id)
-            .group_by(SQLAlchemyTweet.id)
-            .order_by(func.count(sqlalchemy_likes.c.user_id).desc())
-            .options(selectinload(SQLAlchemyTweet.likes))
-        )).scalars().all()
+        return (
+            (
+                await self._session.execute(
+                    select(SQLAlchemyTweet)
+                    .outerjoin(sqlalchemy_likes)
+                    .join(
+                        SQLAlchemyUser, SQLAlchemyTweet.author_id == SQLAlchemyUser.id
+                    )
+                    .join(
+                        sqlalchemy_follows,
+                        sqlalchemy_follows.c.followed_id == SQLAlchemyTweet.author_id,
+                    )
+                    .where(sqlalchemy_follows.c.follower_id == user_id)
+                    .group_by(SQLAlchemyTweet.id)
+                    .order_by(func.count(sqlalchemy_likes.c.user_id).desc())
+                    .options(selectinload(SQLAlchemyTweet.likes))
+                )
+            )
+            .scalars()
+            .all()
+        )
 
     async def create(self, tweet: TweetNotDetailed, author_id: UUID) -> SQLAlchemyTweet:
         return await self._create(

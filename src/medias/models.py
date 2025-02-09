@@ -15,3 +15,4 @@ class DataMedia(DataModel):
 @dataclass
 class FileSystemMedia(DataMedia):
     id: UUID
+    name: str

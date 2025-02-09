@@ -3,7 +3,6 @@
 """
 
 from typing import Annotated
-from uuid import UUID
 
 from pydantic import Field
 
@@ -11,10 +10,10 @@ from src.schemas import Schema
 
 
 class Media(Schema):
-    id: Annotated[
-        UUID,
+    name: Annotated[
+        str,
         Field(
-            description="Уникальный идентификатор",
-            example="4d4d4d4d-4d4d-4d4d-4d4d-4d4d4d4d4d4d",
+            description="Имя файла с расширением",
+            example="2b0b0b0b-0b0b-0b0b-0b0b-0b0b0b0b0b0b.png",
         ),
     ]

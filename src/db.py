@@ -8,8 +8,12 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from sqlalchemy import MetaData
-from sqlalchemy.ext.asyncio import (AsyncEngine, AsyncSession,
-                                    async_sessionmaker, create_async_engine)
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from src.settings import db_settings
 

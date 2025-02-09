@@ -6,7 +6,7 @@ import pytest
 import pytest_asyncio
 from faker import Faker
 
-from src.errors import AlreadyExistsError, NotFoundError, SelfActionError
+from src.errors import NotFoundError, SelfActionError
 from src.users.errors import UnauthenticatedError
 from src.users.models import SQLAlchemyUser
 from src.users.schemas import UserPersonal

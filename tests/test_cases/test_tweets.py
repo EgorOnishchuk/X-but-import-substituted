@@ -10,7 +10,6 @@ from src.tweets.models import SQLAlchemyTweet
 from src.tweets.schemas import TweetNotDetailed
 from src.tweets.services import SQLAlchemyTweetRepository, TweetService
 from src.users.errors import UnauthorizedError
-from src.users.models import SQLAlchemyUser
 from tests.factories import SQLAlchemyTweetFactory, SQLAlchemyUserFactory
 from tests.test_cases.test_model import TestSQLAlchemyModel
 

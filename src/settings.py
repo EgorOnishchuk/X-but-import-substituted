@@ -6,13 +6,26 @@ import re
 from pathlib import Path
 from typing import Annotated, Any, Generic, TypeVar
 
-from pydantic import (AfterValidator, Field, HttpUrl, MariaDBDsn, MySQLDsn,
-                      NonNegativeInt, PositiveInt, PostgresDsn, RedisDsn)
+from pydantic import (
+    AfterValidator,
+    Field,
+    HttpUrl,
+    MariaDBDsn,
+    MySQLDsn,
+    NonNegativeInt,
+    PositiveInt,
+    PostgresDsn,
+    RedisDsn,
+)
 from pydantic_extra_types.semantic_version import SemanticVersion
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT: Path = Path(__file__).parent.parent
 STATIC: Path = ROOT / "static"
+TEMPLATES: Path = STATIC / "templates"
+STYLES: Path = STATIC / "styles"
+SCRIPTS: Path = STATIC / "scripts"
+MEDIAS: Path = STATIC / "medias"
 
 type DBDsn = PostgresDsn | MySQLDsn | MariaDBDsn | RedisDsn
 T = TypeVar("T", bound=DBDsn)

@@ -37,7 +37,7 @@ class FileSystemMediaRepository(MediaRepository):
         async with aiofiles.open(path, "wb") as out_file:
             await out_file.write(await file.read())
 
-        return FileSystemMedia(id_)
+        return FileSystemMedia(id_, f"{id_}{path.suffix}")
 
 
 class MediaService:

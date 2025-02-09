@@ -97,7 +97,7 @@ async def _sign_up(service: Service, user: UserPersonal) -> DataUser:
             "model": Error,
         },
         status.HTTP_403_FORBIDDEN: {
-            "description": "Попытка отслеживать самого " "себя.",
+            "description": "Попытка отслеживать самого себя.",
             "model": Error,
         },
         status.HTTP_404_NOT_FOUND: {
