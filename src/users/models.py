@@ -1,26 +1,11 @@
-"""
-Модели пользователей и их отношения при отслеживании.
-"""
-
-from typing import Any
-
 from sqlalchemy import Column, ForeignKey, String, Table, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.models import DataModel, SQLAlchemyModel
+from src.models import SQLAlchemyIDModel, SQLAlchemyModel
 
 
-class DataUser(DataModel):
-    readable_name = "user"
-
-    name: Any
-    key: Any
-
-    following: Any
-    followers: Any
-
-
-class SQLAlchemyUser(SQLAlchemyModel, DataUser):
+class SQLAlchemyUser(SQLAlchemyIDModel):
+    __readable_name__ = "user"
     __tablename__ = "users"
 
     name: Mapped[str] = mapped_column(String(30), unique=True)

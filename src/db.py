@@ -1,7 +1,3 @@
-"""
-Управление жизненным циклом подключений к БД.
-"""
-
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -19,29 +15,18 @@ from src.settings import db_settings
 
 
 class DBManager(ABC):
-    """
-    Менеджер сессий и базовой конфигурации БД.
-    """
-
     @abstractmethod
     @asynccontextmanager
     def get_session(self) -> AsyncGenerator[Any, None]:
-        """
-        Получает сессию, готовую к работе.
-        :return: Сессия, использование которой в контекстном менеджере автоматизирует коммит, откат и её закрытие.
-        """
+        pass
 
     @abstractmethod
     async def setup(self) -> None:
-        """
-        Создаёт таблицы и, при необходимости, совершает другие подготовительные действия (заполнение данными и т.д.).
-        """
+        pass
 
     @abstractmethod
     async def clear(self) -> None:
-        """
-        Очищает таблицы, и при необходимости, совершает другие действия по финализации.
-        """
+        pass
 
 
 class SQLAlchemyDBManager(DBManager):

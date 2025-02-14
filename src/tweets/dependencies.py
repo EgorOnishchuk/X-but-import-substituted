@@ -1,13 +1,10 @@
-"""
-Зависимости публикаций (твитов).
-"""
-
 from typing import Annotated
 
 from fastapi import Depends
 
 from src.dependencies import Session
-from src.tweets.services import SQLAlchemyTweetRepository, TweetService
+from src.tweets.repositories import SQLAlchemyTweetRepository
+from src.tweets.services import TweetService
 
 
 def _get_tweet_service(session: Session) -> TweetService:

@@ -1,5 +1,6 @@
 """
-Зависимости приложения и другая функциональность, близкая к ним по значению (lifespan и т.д.).
+Сюда относятся не только зависимости приложения, но и другая функциональность, близкая к ним по значению (lifespan и
+т.д.).
 """
 
 from collections.abc import AsyncGenerator
@@ -13,10 +14,6 @@ from src.models import SQLAlchemyModel
 
 
 def get_db_manager() -> DBManager:
-    """
-    Зависимость менеджера БД.
-    :return: Менеджер БД.
-    """
     return SQLAlchemyDBManager(SQLAlchemyModel.metadata)
 
 
@@ -25,10 +22,6 @@ DB_Manager = Annotated[DBManager, Depends(get_db_manager)]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """
-    Подготавливает БД перед запуском приложения. Предназначена для развёртывания, поэтому не удаляет таблицы.
-    :param app: Приложение.
-    """
     await get_db_manager().setup()
 
     yield

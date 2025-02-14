@@ -1,13 +1,13 @@
-"""
-Маршрутизатор публикаций (твитов).
-"""
-
 from fastapi import APIRouter, status
 
-from src.schemas import ID, Error
+from src.schemas import ID, PydanticError
 from src.tweets.dependencies import Service
-from src.tweets.models import DataTweet
-from src.tweets.schemas import TweetDetailed, TweetID, TweetNotDetailed
+from src.tweets.schemas import (
+    PydanticTweetID,
+    PydanticTweetNotDetailed,
+    PydanticTweetPersonal,
+    PydanticTweetsDetailed,
+)
 from src.users.dependencies import CurrentUser
 
 router: APIRouter = APIRouter(prefix="/tweets", tags=["Публикации"])
@@ -15,51 +15,51 @@ router: APIRouter = APIRouter(prefix="/tweets", tags=["Публикации"])
 
 @router.get(
     "",
-    response_model=list[TweetDetailed],
     summary="Получение всех публикаций.",
     response_description="Публикации получены.",
     responses={
         status.HTTP_401_UNAUTHORIZED: {
             "description": "Не передан ключ API.",
-            "model": Error,
+            "model": PydanticError,
         },
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "description": "Неверные данные запроса.",
-            "model": list[Error],
+            "model": list[PydanticError],
         },
     },
 )
-async def _get_list(service: Service, user: CurrentUser) -> list[DataTweet]:
+async def get_list(service: Service, user: CurrentUser) -> PydanticTweetsDetailed:
     """
-    Получение полного списка публикаций (твитов) от отслеживаемых пользователей.
+    Получение полного списка публикаций (твитов) в порядке популярности от отслеживаемых пользователей.
     """
-    return await service.get_all(user)
+    return await service.get_list(user.id)
 
 
 @router.post(
     "",
-    response_model=TweetID,
     status_code=status.HTTP_201_CREATED,
     summary="Создание публикации.",
     response_description="Публикация создана.",
     responses={
         status.HTTP_401_UNAUTHORIZED: {
             "description": "Не передан ключ API.",
-            "model": Error,
+            "model": PydanticError,
         },
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "description": "Неверные данные запроса.",
-            "model": list[Error],
+            "model": list[PydanticError],
         },
     },
 )
-async def _create(
-    tweet: TweetNotDetailed, service: Service, user: CurrentUser
-) -> DataTweet:
+async def publish(
+    tweet: PydanticTweetNotDetailed, service: Service, user: CurrentUser
+) -> PydanticTweetID:
     """
     Создание новой публикации (твита) от лица текущего пользователя (себя).
     """
-    return await service.create(tweet, user.id)
+    return await service.publish(
+        PydanticTweetPersonal(**tweet.to_dict(), author_id=user.id)
+    )
 
 
 @router.delete(
@@ -70,28 +70,28 @@ async def _create(
     responses={
         status.HTTP_401_UNAUTHORIZED: {
             "description": "Не передан ключ API.",
-            "model": Error,
+            "model": PydanticError,
         },
         status.HTTP_404_NOT_FOUND: {
             "description": "Публикация не найдена.",
-            "model": Error,
+            "model": PydanticError,
         },
         status.HTTP_403_FORBIDDEN: {
             "description": "Попытка удалить чужую публикацию.",
-            "model": Error,
+            "model": PydanticError,
         },
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "description": "Неверные данные запроса.",
-            "model": list[Error],
+            "model": list[PydanticError],
         },
     },
 )
-async def _remove(id_: ID, service: Service, user: CurrentUser) -> None:
+async def remove(id_: ID, service: Service, user: CurrentUser) -> None:
     """
     Удаление публикации (твита) текущего пользователя (своей). Попытка удалить несуществующую публикацию не вызывает
     ошибок, т.к. результат в любом случае соответствует ожидаемому — публикация отсутствует.
     """
-    await service.delete(id_, user.id)
+    await service.remove(id_, user.id)
 
 
 @router.post(
@@ -102,26 +102,26 @@ async def _remove(id_: ID, service: Service, user: CurrentUser) -> None:
     responses={
         status.HTTP_401_UNAUTHORIZED: {
             "description": "Не передан ключ API.",
-            "model": Error,
+            "model": PydanticError,
         },
         status.HTTP_404_NOT_FOUND: {
             "description": "Публикация не найдена.",
-            "model": Error,
+            "model": PydanticError,
         },
         status.HTTP_403_FORBIDDEN: {"description": "Попытка отметить свою публикацию."},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "description": "Неверные данные запроса.",
-            "model": list[Error],
+            "model": list[PydanticError],
         },
     },
 )
-async def _like(id_: ID, service: Service, user: CurrentUser) -> None:
+async def like(id_: ID, service: Service, user: CurrentUser) -> None:
     """
     Добавление публикации (твита) в список понравившихся (лайк) текущего пользователя (себя). Попытка добавить
     уже присутствующую публикацию не вызывает ошибок, т.к. результат в любом случае соответствует ожидаемому —
     публикация отмечена.
     """
-    await service.create_like(id_, user)
+    await service.like(id_, user.id)
 
 
 @router.delete(
@@ -132,22 +132,22 @@ async def _like(id_: ID, service: Service, user: CurrentUser) -> None:
     responses={
         status.HTTP_401_UNAUTHORIZED: {
             "description": "Не передан ключ API.",
-            "model": Error,
+            "model": PydanticError,
         },
         status.HTTP_404_NOT_FOUND: {
             "description": "Публикация не найдена.",
-            "model": Error,
+            "model": PydanticError,
         },
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "description": "Неверные данные запроса.",
-            "model": list[Error],
+            "model": list[PydanticError],
         },
     },
 )
-async def _unlike(id_: ID, service: Service, user: CurrentUser) -> None:
+async def unlike(id_: ID, service: Service, user: CurrentUser) -> None:
     """
     Удаление публикации (твита) из списка понравившихся (лайк) текущего пользователя (себя). Попытка удалить
     отсутствующую публикацию не вызывает ошибок, т.к. результат в любом случае соответствует ожидаемому —
     публикация не отмечена.
     """
-    await service.delete_like(id_, user)
+    await service.unlike(id_, user.id)

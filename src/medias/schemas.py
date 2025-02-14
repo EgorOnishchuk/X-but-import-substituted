@@ -1,19 +1,21 @@
-"""
-Схемы медиафайлов.
-"""
-
 from typing import Annotated
 
 from pydantic import Field
+from typing_extensions import Any
 
-from src.schemas import Schema
+from src.schemas import PydanticSchema, Schema
+from src.settings import EXAMPLES
 
 
 class Media(Schema):
+    name: Any
+
+
+class PydanticMedia(PydanticSchema):
     name: Annotated[
         str,
         Field(
             description="Имя файла с расширением",
-            example="2b0b0b0b-0b0b-0b0b-0b0b-0b0b0b0b0b0b.png",
+            examples=[f"{EXAMPLES.uuid4()}.{EXAMPLES.file_extension('image')}"],
         ),
     ]

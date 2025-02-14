@@ -1,11 +1,8 @@
-"""
-Настройки приложения. Декомпозируются на независимые группы.
-"""
-
 import re
 from pathlib import Path
 from typing import Annotated, Any, Generic, TypeVar
 
+from faker import Faker
 from pydantic import (
     AfterValidator,
     Field,
@@ -20,17 +17,12 @@ from pydantic import (
 from pydantic_extra_types.semantic_version import SemanticVersion
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT: Path = Path(__file__).parent.parent
-STATIC: Path = ROOT / "static"
-TEMPLATES: Path = STATIC / "templates"
-STYLES: Path = STATIC / "styles"
-SCRIPTS: Path = STATIC / "scripts"
-MEDIAS: Path = STATIC / "medias"
-
 type DBDsn = PostgresDsn | MySQLDsn | MariaDBDsn | RedisDsn
 T = TypeVar("T", bound=DBDsn)
 
 ROUTE: re.Pattern[str] = re.compile(r"^/\S*$")
+
+EXAMPLES: Faker = Faker("ru_RU")
 
 
 def _to_str(value: Any) -> str:
@@ -74,6 +66,16 @@ class DBSettings(Settings, Generic[T]):
     is_pool_pre_ping: bool = False
 
 
+class SourceSettings(Settings):
+    root: Path = Path(__file__).parent.parent
+
+    static: Path = root / "static"
+    templates: Path = static / "templates"
+    styles: Path = static / "styles"
+    scripts: Path = static / "scripts"
+    medias: Path = static / "medias"
+
+
 class CORSSettings(Settings):
     allowed_origins: Annotated[list[HttpUrl], AfterValidator(_to_strings)] = Field(
         default_factory=list, alias="allow_origins"
@@ -94,4 +96,5 @@ class CORSSettings(Settings):
 
 api_settings = APISettings()  # type: ignore
 db_settings = DBSettings[PostgresDsn]()  # type: ignore
+source_settings = SourceSettings()  # type: ignore
 cors_settings = CORSSettings()  # type: ignore

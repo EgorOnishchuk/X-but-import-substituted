@@ -1,51 +1,74 @@
-"""
-Схемы публикаций (твитов).
-"""
-
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import UUID
 
 from pydantic import Field
 
-from src.schemas import Schema
-from src.users.schemas import UserNotDetailed
+from src.schemas import PydanticRootSchema, PydanticSchema, Schema
+from src.settings import EXAMPLES
+from src.users.schemas import PydanticUserNotDetailed
 
 
 class TweetID(Schema):
+    id: Any
+
+
+class PydanticTweetID(PydanticSchema, TweetID):
     id: Annotated[
         UUID,
         Field(
             description="Уникальный идентификатор",
-            example="7f7f7f7f-7f7f-7f7f-7f7f-7f7f7f7f7f7f",
+            examples=[EXAMPLES.uuid4()],
         ),
     ]
 
 
 class TweetNotDetailed(Schema):
+    text: Any
+    medias: Any
+
+
+class PydanticTweetNotDetailed(PydanticSchema, TweetNotDetailed):
     text: Annotated[
         str,
         Field(
             min_length=1,
             max_length=500,
             description="Текст",
-            example="Повседневная практика показывает, что "
-            "сложившаяся структура организации напрямую "
-            "зависит от экономической целесообразности "
-            "принимаемых решений.",
+            examples=[EXAMPLES.text(20)],
         ),
     ]
     medias: Annotated[
         list[UUID],
         Field(
             description="Медиафайлы",
-            example=[
-                "8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f",
-                "5f5f5f5f-5f5f-5f5f-5f5f-5f5f5f5f5f5f",
-            ],
+            examples=[[EXAMPLES.uuid4()]],
         ),
     ]
 
 
+class TweetPersonal(TweetNotDetailed):
+    author_id: Any
+
+
+class PydanticTweetPersonal(PydanticTweetNotDetailed, TweetPersonal):
+    author_id: Annotated[
+        UUID, Field(description="Уникальный идентификатор", examples=[EXAMPLES.uuid4()])
+    ]
+
+
 class TweetDetailed(TweetID, TweetNotDetailed):
-    author: UserNotDetailed
-    likes: list[UserNotDetailed]
+    author: Any
+    likes: Any
+
+
+class PydanticTweetDetailed(PydanticTweetID, PydanticTweetNotDetailed, TweetDetailed):
+    author: PydanticUserNotDetailed
+    likes: list[PydanticUserNotDetailed]
+
+
+class TweetsDetailed(Schema):
+    root: Any
+
+
+class PydanticTweetsDetailed(PydanticRootSchema, TweetsDetailed):
+    root: list[PydanticTweetDetailed]
