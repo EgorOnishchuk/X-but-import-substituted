@@ -7,15 +7,30 @@ from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-import src.settings as settings
 from src.dependencies import lifespan
-from src.errors import http_exception_handler, validation_handler
+from src.errors import (
+    AlreadyExistsError,
+    NotFoundError,
+    SelfActionError,
+    already_exists_handler,
+    http_exception_handler,
+    not_found_handler,
+    self_action_handler,
+    validation_handler,
+)
 from src.medias.routes import router as medias
+from src.settings import api_settings, cors_settings, source_settings
 from src.tweets.routes import router as tweets
+from src.users.errors import (
+    UnauthenticatedError,
+    UnauthorizedError,
+    unauthenticated_handler,
+    unauthorized_handler,
+)
 from src.users.routes import router as users
 
 app = FastAPI(
-    **settings.api_settings.model_dump(by_alias=True),
+    **api_settings.model_dump(by_alias=True),
     openapi_tags=[
         {
             "name": "Статические файлы",
@@ -26,18 +41,28 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-for static in (settings.TEMPLATES, settings.STYLES, settings.SCRIPTS, settings.MEDIAS):
+for static in (
+    source_settings.templates,
+    source_settings.styles,
+    source_settings.scripts,
+    source_settings.medias,
+):
     app.mount(
-        f"/{settings.STATIC.name}/{static.name}",
+        f"/{source_settings.static.name}/{static.name}",
         StaticFiles(directory=static),
         name=static.name,
     )
 
-app.add_middleware(CORSMiddleware, **settings.cors_settings.model_dump(by_alias=True))
+app.add_middleware(CORSMiddleware, **cors_settings.model_dump(by_alias=True))
 
 for exc, handler in (
-    (HTTPException, http_exception_handler),
     (RequestValidationError, validation_handler),
+    (NotFoundError, not_found_handler),
+    (AlreadyExistsError, already_exists_handler),
+    (SelfActionError, self_action_handler),
+    (UnauthenticatedError, unauthenticated_handler),
+    (UnauthorizedError, unauthorized_handler),
+    (HTTPException, http_exception_handler),
 ):
     app.add_exception_handler(exc, handler)  # type: ignore
 
