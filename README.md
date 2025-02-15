@@ -1,5 +1,12 @@
 # Tweeter (X) — импортозамещённая версия популярной соцсети
 
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Pytest](https://img.shields.io/badge/pytest-%23ffffff.svg?style=for-the-badge&logo=pytest&logoColor=2f9fe3)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![wemake-python-styleguide](https://img.shields.io/badge/style-wemake-000000.svg)](https://github.com/wemake-services/wemake-python-styleguide)
+
 ## Из этого руководства Вы узнаете:
 
 1. Как быстро начать работу — запустить проект «из коробки»
@@ -64,7 +71,7 @@ CRUD. В **models.py** находятся _модели_, которые исп�
 Более того, хранилище может и не быть _реляционным_. Так сделано, например, для изображений, которые хранятся в 
 файловой системе (**FileSystemMediaRepository** из _src/medias/services.py_) и моделей для них вообще не предусмотрено.
 
-### Как перейти на другого поставщика схем?
+### Как перейти на другого поставщика схем (Attrs, Marshmallow и т.д.)?
 
 1. Создать новую схему — наследника Schema в **schemas.py**
 2. Применить её к выходным и/или входным данным репозитория через соответствующие декораторы
