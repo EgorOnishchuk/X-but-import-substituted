@@ -10,6 +10,11 @@ services:
         container_name: web-prod
         ports:
             - ${API_PORT}:8000
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
         command: uvicorn src.main:app --host 0.0.0.0 --port 8000
         depends_on:
             - db-prod
@@ -43,6 +48,11 @@ services:
         container_name: db-prod
         volumes:
             - data:/var/lib/postgresql/data
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "3m"
+                max-file: "1"
         profiles:
             - prod
 
